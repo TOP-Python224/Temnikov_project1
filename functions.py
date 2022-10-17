@@ -3,8 +3,8 @@ import configparser
 from pprint import pprint
 from data import STATS, players_file
 
-def read_ini(file: str, statistics: dict) -> dict:
-    # """Считывает статистику об игроках из ini-файла и записывает данные в глобальную переменную STATS."""
+def read_ini(file: str, statistics: dict) -> None:
+    """Считывает статистику об игроках из ini-файла и записывает данные в глобальную переменную STATS."""
     config = configparser.ConfigParser()
     config.read(file)
     for section in config.sections():
