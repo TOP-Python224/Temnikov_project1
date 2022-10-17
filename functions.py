@@ -3,7 +3,7 @@
 from configparser import ConfigParser
 from pprint import pprint
 
-from data import STATS, players_file
+from data import STATS, players_file, RANGE, BOARD, DIM
 
 
 def read_ini(file: str, statistics: dict) -> None:
@@ -22,18 +22,20 @@ def write_ini(file: str, statistics: dict) -> None:
         config.write(fileout)
 
 
+def draw_board() -> str:
+    cross_line = '-------------'
+    print(cross_line)
+    for i in RANGE:
+        print('|', BOARD[0 + i * DIM], '|', BOARD[1 + i * DIM], '|', BOARD[2 + i * DIM], '|')
+    print(cross_line)
+
 if __name__ == '__main__':
-    read_ini(players_file, STATS)
-    pprint(STATS)
-    STATS['Arisber'] = {'wins': 5, 'losses': 4, 'ties': 3}
-    write_ini(players_file, STATS)
-    read_ini(players_file, STATS)
-    pprint(STATS)
+    draw_board()
 
+# stdout:
+# -------------
+# |   |   |   |
+# |   |   |   |
+# |   |   |   |
+# -------------
 
-# std_out:
-# {'Player1': {'losses': 3, 'ties': 1, 'wins': 2},
-#  'Player2': {'losses': 0, 'ties': 0, 'wins': 0}}
-# {'Arisber': {'losses': 4, 'ties': 3, 'wins': 5},
-#  'Player1': {'losses': 3, 'ties': 1, 'wins': 2},
-#  'Player2': {'losses': 0, 'ties': 0, 'wins': 0}}
