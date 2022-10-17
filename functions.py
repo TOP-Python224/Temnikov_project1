@@ -1,23 +1,28 @@
 """Дополнительный модуль: вспомогательные функции."""
-# ИСПОЛЬЗОВАТЬ: из стандартной библиотеки лучше импортировать только необходимые объекты, чем модули целиком — последни могут быть весьма объёмными
+
 from configparser import ConfigParser
 from pprint import pprint
+
 from data import STATS, players_file
 
 
 def read_ini(file: str, statistics: dict) -> None:
     """Считывает статистику об игроках из ini-файла и записывает данные в глобальную переменную STATS."""
     config = ConfigParser()
+    # ДОБАВИТЬ: кодировку ещё укажите явно
     config.read(file)
     for section in config.sections():
         statistics[section] = {key: int(value) for key, value in config[section].items()}
+
 
 def write_ini(file: str, statistics: dict) -> None:
     """Записывает данные из глобальной переменной STATS в ini - файл."""
     config = ConfigParser()
     config.read_dict(statistics)
-    with open(file, 'w') as players_stats:
-        config.write(players_stats)
+    # ДОБАВИТЬ: кодировку ещё укажите явно
+    with open(file, 'w') as fileout:
+        config.write(fileout)
+
 
 if __name__ == '__main__':
     read_ini(players_file, STATS)
