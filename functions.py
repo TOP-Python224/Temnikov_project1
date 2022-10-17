@@ -9,8 +9,7 @@ from data import STATS, players_file
 def read_ini(file: str, statistics: dict) -> None:
     """Считывает статистику об игроках из ini-файла и записывает данные в глобальную переменную STATS."""
     config = ConfigParser()
-    # ДОБАВИТЬ: кодировку ещё укажите явно
-    config.read(file)
+    config.read(file, encoding='utf-8')
     for section in config.sections():
         statistics[section] = {key: int(value) for key, value in config[section].items()}
 
@@ -19,8 +18,7 @@ def write_ini(file: str, statistics: dict) -> None:
     """Записывает данные из глобальной переменной STATS в ini - файл."""
     config = ConfigParser()
     config.read_dict(statistics)
-    # ДОБАВИТЬ: кодировку ещё укажите явно
-    with open(file, 'w') as fileout:
+    with open(file, 'w', encoding='utf-8') as fileout:
         config.write(fileout)
 
 
