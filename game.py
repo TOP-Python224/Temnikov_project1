@@ -8,7 +8,7 @@ def take_input(player: str, player_token: str) -> str:
     """Запрашивает позицию в которую игрок хочет поставить 'X' или '0."""
     while True:
         value = input(player + ' Куда поставить: ' + player_token + '? ')
-        if not (value in '123456789'):
+        if not (value in ('1', '2', '3', '4', '5', '6', '7', '8', '9')):
             print('Ошибка')
             continue
         value = int(value)
