@@ -22,15 +22,15 @@ def write_ini(file: str, statistics: dict) -> None:
         config.write(fileout)
 
 
-def draw_board() -> str:
+def draw_board(pos_index: int, pos_arg: int) -> str:
     cross_line = '-------------'
-    print(cross_line)
+    print(cross_line.rjust(pos_index))
     for i in RANGE:
-        print('|', BOARD[0 + i * DIM], '|', BOARD[1 + i * DIM], '|', BOARD[2 + i * DIM], '|')
-    print(cross_line)
+        print('|'.rjust(pos_index - pos_arg), BOARD[0 + i * DIM], '|', BOARD[1 + i * DIM], '|', BOARD[2 + i * DIM], '|')
+    print(cross_line.rjust(pos_index))
 
 if __name__ == '__main__':
-    draw_board()
+    draw_board(0, 0)
 
 # stdout:
 # -------------

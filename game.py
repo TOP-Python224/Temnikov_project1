@@ -7,7 +7,7 @@ from functions import draw_board
 def take_input(player: str, player_token: str) -> str:
     """Запрашивает позицию в которую игрок хочет поставить 'X' или '0."""
     while True:
-        value = input(player + ' Куда поставить: ' + player_token + '? ')
+        value = input(player.rjust(49 if player_token == '0' else 0) + ' Куда поставить: ' + player_token + '? ')
         if not (value in ('1', '2', '3', '4', '5', '6', '7', '8', '9')):
             print('Ошибка')
             continue
@@ -30,7 +30,9 @@ def check_win() -> bool:
 if __name__ == '__main__':
     counter = 0
     while True:
-        draw_board()
+        pos_index = 70 if counter % 2 != 0 else 0
+        pos_arg = 12 if counter % 2 != 0 else 0
+        draw_board(pos_index, pos_arg)
         if counter % 2 == 0:
             take_input(PLAYERS[0], TOKENS[0])
         else:
@@ -39,17 +41,17 @@ if __name__ == '__main__':
             winner = check_win()
             if winner:
                 if winner == 'X':
-                    draw_board()
-                    print(PLAYERS[0], 'выиграл')
+                    draw_board(42, 12)
+                    print(PLAYERS[0].rjust(35), 'выиграл')
                     break
                 else:
                     draw_board()
-                    print(PLAYERS[1], 'выиграл')
+                    print(PLAYERS[1].rjust(35), 'выиграл')
                     break
         counter += 1
         if counter > 8:
-            draw_board()
-            print('Ничья')
+            draw_board(42, 12)
+            print('Ничья'.rjust(38))
             break
     print(BOARD)
     print(TURNS)
@@ -64,37 +66,64 @@ if __name__ == '__main__':
 # | 7 | 8 | 9 |
 # -------------
 # Player1 Куда поставить: X? 5
+#                                                          -------------
+#                                                          | 1 | 2 | 3 |
+#                                                          | 4 | X | 6 |
+#                                                          | 7 | 8 | 9 |
+#                                                          -------------
+#                                           Player2 Куда поставить: 0? 2
 # -------------
-# | 1 | 2 | 3 |
+# | 1 | 0 | 3 |
 # | 4 | X | 6 |
 # | 7 | 8 | 9 |
 # -------------
-# Player2 Куда поставить: 0? 1
+# Player1 Куда поставить: X? 1
+#                                                          -------------
+#                                                          | X | 0 | 3 |
+#                                                          | 4 | X | 6 |
+#                                                          | 7 | 8 | 9 |
+#                                                          -------------
+#                                           Player2 Куда поставить: 0? 9
 # -------------
-# | 0 | 2 | 3 |
+# | X | 0 | 3 |
 # | 4 | X | 6 |
-# | 7 | 8 | 9 |
+# | 7 | 8 | 0 |
 # -------------
-# Player1 Куда поставить: X? 2
+# Player1 Куда поставить: X? 4
+#                                                          -------------
+#                                                          | X | 0 | 3 |
+#                                                          | X | X | 6 |
+#                                                          | 7 | 8 | 0 |
+#                                                          -------------
+#                                           Player2 Куда поставить: 0? 6
 # -------------
-# | 0 | X | 3 |
-# | 4 | X | 6 |
-# | 7 | 8 | 9 |
-# -------------
-# Player2 Куда поставить: 0? 4
-# -------------
-# | 0 | X | 3 |
-# | 0 | X | 6 |
-# | 7 | 8 | 9 |
+# | X | 0 | 3 |
+# | X | X | 0 |
+# | 7 | 8 | 0 |
 # -------------
 # Player1 Куда поставить: X? 8
+#                                                          -------------
+#                                                          | X | 0 | 3 |
+#                                                          | X | X | 0 |
+#                                                          | 7 | X | 0 |
+#                                                          -------------
+#                                           Player2 Куда поставить: 0? 7
 # -------------
-# | 0 | X | 3 |
-# | 0 | X | 6 |
-# | 7 | X | 9 |
+# | X | 0 | 3 |
+# | X | X | 0 |
+# | 0 | X | 0 |
 # -------------
-# Player1 выиграл
-# ['0', 'X', 3, '0', 'X', 6, 7, 'X', 9]
-# [5, 1, 2, 4, 8]
+# Player1 Куда поставить: X? 3
+#                              -------------
+#                              | X | 0 | X |
+#                              | X | X | 0 |
+#                              | 0 | X | 0 |
+#                              -------------
+#                                  Ничья
+# ['X', '0', 'X', 'X', 'X', '0', '0', 'X', '0']
+# [5, 2, 1, 9, 4, 6, 8, 7, 3]
+
+
+
 
 
