@@ -3,28 +3,47 @@
 from configparser import ConfigParser
 from pprint import pprint
 
-from data import STATS, SAVES, players_file, saves_file, RANGE, BOARD, DIM, PLAYERS
+from data import STATS, SAVES, PLAYERS_FILE, SAVES_FILE, RANGE, BOARD, DIM, PLAYERS, TURNS
 
 def get_nickname() -> list:
+    """Запрашивает никнеймы игроков и записывает данные в глобальную переменную PLAYERS."""
     player_1 = input('Игрок_1 - введите свой никнейм: ')
     player_2 = input('Игрок_2 - введите свой никнейм: ')
     PLAYERS.clear()
     PLAYERS.insert(0, player_1)
     PLAYERS.insert(1, player_2)
 
-def read_ini(file: str, statistics: dict) -> None:
+def read_ini() -> None:
     """Считывает статистику об игроках из ini-файла и записывает данные в глобальную переменную STATS."""
-    config = ConfigParser()
-    config.read(file, encoding='utf-8')
-    for section in config.sections():
-        statistics[section] = {key: int(value) for key, value in config[section].items()}
+    players = ConfigParser()
+    players.read(PLAYERS_FILE, encoding='utf-8')
+    for section in players.sections():
+        STATS[section] = {key: int(value) for key, value in players[section].items()}
+    saves = ConfigParser()
+    saves.read(SAVES_FILE, encoding='utf-8')
+    for section in saves.sections():
+        players = section.split(';')
+        players_key = (players[0], players[1])
+        turns = [int(i) for i in saves[section]['turns'].split(',')]
+        SAVES[players_key] = {players[0]: [], players[1]: [], 'turns': turns}
+        for i, turn in enumerate(turns):
+            SAVES[players_key][players[i % 2]].append(turn)
 
-def write_ini(file: str, statistics: dict) -> None:
+
+def write_ini() -> None:
     """Записывает данные из глобальной переменной STATS в ini - файл."""
-    config = ConfigParser()
-    config.read_dict(statistics)
-    with open(file, 'w', encoding='utf-8') as fileout:
-        config.write(fileout)
+    players = ConfigParser()
+    players.read_dict(STATS)
+    with open(PLAYERS_FILE, 'w', encoding='utf-8') as fileout:
+        players.write(fileout)
+    saves = ConfigParser()
+    saves.read_dict(SAVES)
+    for elem in PLAYERS:
+        section = f"{PLAYERS[0]};{PLAYERS[1]}"
+        saves[section] = {}
+        saves[section]['turns'] = ','.join([str(i) for i in TURNS])
+    with open(SAVES_FILE, 'a', encoding='utf-8') as fileout:
+        saves.write(fileout)
 
 
 def draw_board(pos_index: int, pos_arg: int) -> str:
@@ -35,7 +54,11 @@ def draw_board(pos_index: int, pos_arg: int) -> str:
     print(cross_line.rjust(pos_index))
 
 if __name__ == '__main__':
-    draw_board(0, 0)
+#     draw_board(0, 0)
+    write_ini()
+    pprint(SAVES)
+
+
 
 # stdout:
 # -------------
