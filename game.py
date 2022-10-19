@@ -5,27 +5,29 @@ from functions import draw_board, get_nickname
 
 
 def take_input(player: str, player_token: str) -> str:
-    """Запрашивает позицию в которую игрок хочет поставить 'X' или '0."""
+    """Запрашивает позицию в которую игрок хочет поставить 'X' или '0'."""
     while True:
         value = input(player.rjust(49 if player_token == '0' else 0) + ' Куда поставить: ' + player_token + '? ')
-        if not (value in ('1', '2', '3', '4', '5', '6', '7', '8', '9')):
+        if not (value in '123456789'):
             print('Ошибка')
             continue
         value = int(value)
         TURNS.append(value)
-        if str(BOARD[value - 1]) in 'X0':
+        if str(BOARD[value-1]) in 'X0':
             print('Занято')
             continue
-        BOARD[value - 1] = player_token
+        BOARD[value-1] = player_token
         break
 
+
 def check_win() -> bool:
-    """Проверяет наличие выиграшной комбинации для каждого из игроков."""
+    """Проверяет наличие выигрышной комбинации для каждого из игроков."""
     for each in WINS_COORDS:
-        if (BOARD[each[0]-1]) == (BOARD[each[1]-1]) == (BOARD[each[2]-1]):
+        if BOARD[each[0]-1] == BOARD[each[1]-1] == BOARD[each[2]-1]:
             return BOARD[each[1]-1]
     else:
         return False
+
 
 if __name__ == '__main__':
     get_nickname()
@@ -57,8 +59,6 @@ if __name__ == '__main__':
     print(PLAYERS)
     print(BOARD)
     print(TURNS)
-
-
 
 
 # stdout:
@@ -109,11 +109,3 @@ if __name__ == '__main__':
 # ['Arisber', 'Krah']
 # ['0', 'X', 'X', '0', 'X', 6, '0', 8, 9]
 # [5, 1, 2, 4, 3, 7]
-
-
-
-
-
-
-
-
