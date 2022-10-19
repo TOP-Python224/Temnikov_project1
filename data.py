@@ -5,7 +5,8 @@
 APP_TITLE = "КРЕСТИКИ-НОЛИКИ"
 PROMPT = ' > '
 
-players_file = 'players.ini'
+PLAYERS_FILE = 'players.ini'
+SAVES_FILE = 'saves.ini'
 
 
 # глобальные переменные данных

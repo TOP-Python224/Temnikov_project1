@@ -1,7 +1,7 @@
 """Дополнительный модуль: обработка игрового процесса."""
 
 from data import BOARD, WINS_COORDS, TOKENS, TURNS, PLAYERS
-from functions import draw_board, get_nickname
+from functions import draw_board, get_nickname, write_ini, read_ini
 
 
 def take_input(player: str, player_token: str) -> str:
@@ -69,6 +69,7 @@ if __name__ == '__main__':
             draw_board(42, 12)
             print('Ничья'.rjust(38))
             break
+    write_ini()
     print(PLAYERS)
     print(BOARD)
     print(TURNS)
