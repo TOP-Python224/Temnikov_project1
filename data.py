@@ -14,8 +14,9 @@ SAVES = {}
 
 DIM = 3
 RANGE = range(DIM)
+RANGE_FLAT = range(DIM**2)
 
-PLAYERS = ['Player1', 'Player2']
+PLAYERS = []
 TOKENS = ('X', 'O')
 WINS_COORDS = [(1, 2, 3), (4, 5, 6), (7, 8, 9), (1, 4, 7), (2, 5, 8), (3, 6, 9), (1, 5, 9), (3, 5, 7)]
 

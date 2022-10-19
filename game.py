@@ -5,34 +5,45 @@ from functions import draw_board, get_nickname
 
 
 def take_input(player: str, player_token: str) -> str:
+    # ИСПРАВИТЬ: разве только запрашивает? я бы как раз написал функцию, которая только запрашивает, а отдельно написал бы другую, которая производит обновление в глобальных переменных, но это не строго, можно и объединить в одной функции, как вы сделали — только тогда имя и документация должны соответствовать
     """Запрашивает позицию в которую игрок хочет поставить 'X' или '0'."""
     while True:
-        value = input(player.rjust(49 if player_token == '0' else 0) + ' Куда поставить: ' + player_token + '? ')
-        if not (value in '123456789'):
+        inp = input(player.rjust(49 if player_token == '0' else 0)
+                      + f' Куда поставить: {player_token}? ')
+        if not (inp in '123456789'):
             print('Ошибка')
             continue
-        value = int(value)
-        TURNS.append(value)
-        if str(BOARD[value-1]) in 'X0':
+        inp = int(inp)
+        # ИСПРАВИТЬ: почему добавляете в список ходов до проверки, занято ли поле?
+        TURNS.append(inp)
+        # ИСПРАВИТЬ: обратите внимание, что после изменения мной одного из символов в data.TOKENS этот код работает некорректно — именно поэтому мы должны использовать глобальные переменные, а не литералы
+        if str(BOARD[inp-1]) in 'X0':
             print('Занято')
             continue
-        BOARD[value-1] = player_token
+        BOARD[inp-1] = player_token
         break
 
 
 def check_win() -> bool:
+    # ИСПРАВИТЬ: что значит "для каждого из игроков"? для этой функции есть разница?
     """Проверяет наличие выигрышной комбинации для каждого из игроков."""
-    for each in WINS_COORDS:
-        if BOARD[each[0]-1] == BOARD[each[1]-1] == BOARD[each[2]-1]:
-            return BOARD[each[1]-1]
+    for combination in WINS_COORDS:
+        c1, c2, c3 = combination
+        # ИСПРАВИТЬ: может, раз уж вы жёстко прописываете комбинации, то имеет смысл прописать их адекватно индексам, а не пользовательскому вводу, который здесь никак не используется? эти четыре одинаковых вычитания должны были навести вас на эту мысль
+        if BOARD[c1-1] == BOARD[c2-1] == BOARD[c2-1]:
+            # ИСПРАВИТЬ: функция должна возвращать логическое значение, а не токен
+            return BOARD[combination[1]-1]
     else:
         return False
 
 
 if __name__ == '__main__':
     get_nickname()
+    # ИСПОЛЬЗОВАТЬ: при таком построении обработки партии вместо counter и while лучше использовать for i in data.RANGE_FLAT
     counter = 0
     while True:
+        # УДАЛИТЬ: эти вычисления относятся к выводу и должны проводиться в функции, отвечающей за вывод, то есть в functions.draw_board() — а здесь мы только передаём параметр для выравнивания: влево (по умолчанию), вправо, центр
+        # ИСПОЛЬЗОВАТЬ: в модуле shutil есть функция get_terminal_size()
         pos_index = 70 if counter % 2 != 0 else 0
         pos_arg = 12 if counter % 2 != 0 else 0
         draw_board(pos_index, pos_arg)
@@ -43,6 +54,8 @@ if __name__ == '__main__':
         if counter > 3:
             winner = check_win()
             if winner:
+                # ИСПРАВИТЬ: откуда здесь внезапно литерал? есть же data.TOKENS
+                # ИСПОЛЬЗОВАТЬ: и, раз уж возвращаете токен в check_win(), то вместо последнего if стоило куда короче написать, избегая дублирования кода — что-нибудь такое: data.PLAYERS[data.TOKENS.index(winner)]
                 if winner == 'X':
                     draw_board(42, 12)
                     print(PLAYERS[0].rjust(35), 'выиграл')
