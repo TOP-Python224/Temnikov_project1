@@ -24,7 +24,7 @@ def check_win() -> bool:
     """Проверяет наличие выигрышной комбинации."""
     for each in data.WINS_COORDS:
         if data.BOARD[each[0]-1] == data.BOARD[each[1]-1] == data.BOARD[each[2]-1]:
-            return data.BOARD[each[0]-1]
+            return bool(data.BOARD[each[0]-1])
     else:
         return False
 
