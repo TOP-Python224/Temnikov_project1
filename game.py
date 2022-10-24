@@ -1,125 +1,67 @@
 """Дополнительный модуль: обработка игрового процесса."""
 
-from data import BOARD, WINS_COORDS, TOKENS, TURNS, PLAYERS
-from functions import draw_board, get_nickname, write_ini, read_ini
+import data
+import functions
 
 
-def take_input(player: str, player_token: str) -> str:
-    # ИСПРАВИТЬ: разве только запрашивает? я бы как раз написал функцию, которая только запрашивает, а отдельно написал бы другую, которая производит обновление в глобальных переменных, но это не строго, можно и объединить в одной функции, как вы сделали — только тогда имя и документация должны соответствовать
-    """Запрашивает позицию в которую игрок хочет поставить 'X' или '0'."""
+def take_input(player: str, player_token: str) -> None:
+    """Запрашивает позицию в которую игрок хочет поставить токен 'X' или '0', проверяет возможность проставить токен в указанную клетку,
+    отрисовывает доску с проставленным токеном и записывает ход в глобальную переменную TURNS."""
     while True:
-        inp = input(player.rjust(49 if player_token == '0' else 0)
-                      + f' Куда поставить: {player_token}? ')
+        inp = input(player + f' Куда поставить: {player_token}? ')
         if not (inp in '123456789'):
             print('Ошибка')
             continue
         inp = int(inp)
-        # ИСПРАВИТЬ: почему добавляете в список ходов до проверки, занято ли поле?
-        TURNS.append(inp)
-        # ИСПРАВИТЬ: обратите внимание, что после изменения мной одного из символов в data.TOKENS этот код работает некорректно — именно поэтому мы должны использовать глобальные переменные, а не литералы
-        if str(BOARD[inp-1]) in 'X0':
+        if str(data.BOARD[inp-1]) in data.TOKENS:
             print('Занято')
             continue
-        BOARD[inp-1] = player_token
+        data.BOARD[inp-1] = player_token
+        data.TURNS.append(inp)
         break
 
-
 def check_win() -> bool:
-    # ИСПРАВИТЬ: что значит "для каждого из игроков"? для этой функции есть разница?
-    """Проверяет наличие выигрышной комбинации для каждого из игроков."""
-    for combination in WINS_COORDS:
-        c1, c2, c3 = combination
-        # ИСПРАВИТЬ: может, раз уж вы жёстко прописываете комбинации, то имеет смысл прописать их адекватно индексам, а не пользовательскому вводу, который здесь никак не используется? эти четыре одинаковых вычитания должны были навести вас на эту мысль
-        if BOARD[c1-1] == BOARD[c2-1] == BOARD[c2-1]:
-            # ИСПРАВИТЬ: функция должна возвращать логическое значение, а не токен
-            return BOARD[combination[1]-1]
+    """Проверяет наличие выигрышной комбинации."""
+    for each in data.WINS_COORDS:
+        if data.BOARD[each[0]-1] == data.BOARD[each[1]-1] == data.BOARD[each[2]-1]:
+            return data.BOARD[each[0]-1]
     else:
         return False
 
-
-if __name__ == '__main__':
-    get_nickname()
-    # ИСПОЛЬЗОВАТЬ: при таком построении обработки партии вместо counter и while лучше использовать for i in data.RANGE_FLAT
+def game() -> None:
+    """Обрабатывает игровую партию."""
     counter = 0
     while True:
-        # УДАЛИТЬ: эти вычисления относятся к выводу и должны проводиться в функции, отвечающей за вывод, то есть в functions.draw_board() — а здесь мы только передаём параметр для выравнивания: влево (по умолчанию), вправо, центр
-        # ИСПОЛЬЗОВАТЬ: в модуле shutil есть функция get_terminal_size()
-        pos_index = 70 if counter % 2 != 0 else 0
-        pos_arg = 12 if counter % 2 != 0 else 0
-        draw_board(pos_index, pos_arg)
+        functions.draw_board('left')
         if counter % 2 == 0:
-            take_input(PLAYERS[0], TOKENS[0])
+            take_input(data.PLAYERS[0], data.TOKENS[0])
         else:
-            take_input(PLAYERS[1], TOKENS[1])
+            take_input(data.PLAYERS[1], data.TOKENS[1])
         if counter > 3:
             winner = check_win()
             if winner:
-                # ИСПРАВИТЬ: откуда здесь внезапно литерал? есть же data.TOKENS
-                # ИСПОЛЬЗОВАТЬ: и, раз уж возвращаете токен в check_win(), то вместо последнего if стоило куда короче написать, избегая дублирования кода — что-нибудь такое: data.PLAYERS[data.TOKENS.index(winner)]
-                if winner == 'X':
-                    draw_board(42, 12)
-                    print(PLAYERS[0].rjust(35), 'выиграл')
+                if winner == data.TOKENS[0]:
+                    functions.draw_board('center')
+                    print(data.PLAYERS[0], 'выиграл')
                     break
                 else:
-                    draw_board(42, 12)
-                    print(PLAYERS[1].rjust(34), 'выиграл')
+                    functions.draw_board('center')
+                    print(data.PLAYERS[1], 'выиграл')
                     break
         counter += 1
         if counter > 8:
-            draw_board(42, 12)
-            print('Ничья'.rjust(38))
+            functions.draw_board('center')
+            print('Ничья')
             break
-    write_ini()
-    print(PLAYERS)
-    print(BOARD)
-    print(TURNS)
 
+if __name__ == '__main__':
+    functions.get_main_player_nickname()
+    functions.get_second_player_nickname()
+    game()
 
-# stdout:
-# Игрок_1 - введите свой никнейм: Arisber
-# Игрок_2 - введите свой никнейм: Krah
-# -------------
-# | 1 | 2 | 3 |
-# | 4 | 5 | 6 |
-# | 7 | 8 | 9 |
-# -------------
-# Arisber Куда поставить: X? 5
-#                                                          -------------
-#                                                          | 1 | 2 | 3 |
-#                                                          | 4 | X | 6 |
-#                                                          | 7 | 8 | 9 |
-#                                                          -------------
-#                                              Krah Куда поставить: 0? 1
-# -------------
-# | 0 | 2 | 3 |
-# | 4 | X | 6 |
-# | 7 | 8 | 9 |
-# -------------
-# Arisber Куда поставить: X? 2
-#                                                          -------------
-#                                                          | 0 | X | 3 |
-#                                                          | 4 | X | 6 |
-#                                                          | 7 | 8 | 9 |
-#                                                          -------------
-#                                              Krah Куда поставить: 0? 4
-# -------------
-# | 0 | X | 3 |
-# | 0 | X | 6 |
-# | 7 | 8 | 9 |
-# -------------
-# Arisber Куда поставить: X? 3
-#                                                          -------------
-#                                                          | 0 | X | X |
-#                                                          | 0 | X | 6 |
-#                                                          | 7 | 8 | 9 |
-#                                                          -------------
-#                                              Krah Куда поставить: 0? 7
-#                              -------------
-#                              | 0 | X | X |
-#                              | 0 | X | 6 |
-#                              | 0 | 8 | 9 |
-#                              -------------
-#                               Krah выиграл
-# ['Arisber', 'Krah']
-# ['0', 'X', 'X', '0', 'X', 6, '0', 8, 9]
-# [5, 1, 2, 4, 3, 7]
+    functions.read_ini()
+    print(data.PLAYERS)
+    print(data.BOARD)
+    print(data.TURNS)
+    print(data.STATS)
+

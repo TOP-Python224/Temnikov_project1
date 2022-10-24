@@ -1,82 +1,84 @@
 """Дополнительный модуль: вспомогательные функции."""
 
 from configparser import ConfigParser
+from typing import Literal
+from shutil import get_terminal_size
 from pprint import pprint
 
-from data import BOARD, PLAYERS, SAVES_FILE, SAVES, STATS, DIM, PLAYERS_FILE, RANGE
+import data
 
 
 def read_ini() -> None:
-    """Считывает статистику об игроках из ini-файла и записывает данные в глобальную переменную STATS."""
+    """Считывает статистику об игроках и сохраненные игры из ini-файлой и записывает данные в глобальную переменную STATS и SAVES."""
     players = ConfigParser()
-    players.read(PLAYERS_FILE, encoding='utf-8')
+    players.read(data.PLAYERS_FILE, encoding='utf-8')
     for section in players.sections():
-        STATS[section] = {key: int(value) for key, value in players[section].items()}
+        data.STATS[section] = {
+            key: int(value) if value.isdecimal() else value
+            for key, value in players[section].items()
+        }
     saves = ConfigParser()
-    saves.read(SAVES_FILE, encoding='utf-8')
+    saves.read(data.SAVES_FILE, encoding='utf-8')
     for section in saves.sections():
-        players = section.split(';')
-        players_key = (players[0], players[1])
+        players = tuple(section.split(';'))
         turns = [int(i) for i in saves[section]['turns'].split(',')]
-        SAVES[players_key] = {players[0]: [], players[1]: [], 'turns': turns}
-        for i, turn in enumerate(turns):
-            SAVES[players_key][players[i % 2]].append(turn)
+        data.SAVES[players] = turns
 
 
-def write_ini() -> None:
+def write_ini_stats() -> None:
     """Записывает данные из глобальной переменной STATS в ini - файл."""
     players = ConfigParser()
-    players.read_dict(STATS)
-    with open(PLAYERS_FILE, 'w', encoding='utf-8') as fileout:
+    players.read_dict(data.STATS)
+    with open(data.PLAYERS_FILE, 'w', encoding='utf-8') as fileout:
         players.write(fileout)
+
+def write_ini_saves() -> None:
+    """Записывает данные из глобальной переменной SAVES в ini - файл."""
     saves = ConfigParser()
-    saves.read_dict(SAVES)
-    for elem in PLAYERS:
-        section = f"{PLAYERS[0]};{PLAYERS[1]}"
+    for elem in data.SAVES:
+        player1, player2 = list(elem)
+        section = f"{player1};{player2}"
         saves[section] = {}
-        saves[section]['turns'] = ','.join([str(i) for i in TURNS])
-    with open(SAVES_FILE, 'a', encoding='utf-8') as fileout:
+        saves[section]['turns'] = ','.join([str(i) for i in data.SAVES[elem]])
+    with open(data.SAVES_FILE, 'w', encoding='utf-8') as fileout:
         saves.write(fileout)
 
 
-# ИСПРАВИТЬ: аннотация возвращаемого значения не соответствует действительности
-def get_nickname() -> list:
-    """Запрашивает никнеймы игроков и записывает данные в глобальную переменную PLAYERS."""
+def get_main_player_nickname() -> None:
+    """Запрашивает никнейм главного пользователя, проверяет наличие пользователя в базе игороков,
+    в случае отсутсвия добавляет игрока в базу и записывает данные в глобальную переменную STATS и PLAYERS."""
     player_1 = input('Игрок_1 - введите свой никнейм: ')
-    # ДОБАВИТЬ: проверку, существует ли имя, если нет, то добавить его в data.STATS — можно отдельной функцией, можно здесь же
+    if player_1 not in data.STATS.keys():
+        data.STATS[player_1] = {'wins': 0, 'losses': 0, 'ties': 0, 'training': False}
+    data.PLAYERS.append(player_1)
 
-    # УДАЛИТЬ: для теста хорошо, но не забывайте о режимах игры
+def get_second_player_nickname() -> None:
+    """Запрашивает никнейм второго пользователя, проверяет наличие пользователя в базе игороков,
+    в случае отсутсвия добавляет игрока в базу и записывает данные в глобальную переменную STATS и PLAYERS."""
     player_2 = input('Игрок_2 - введите свой никнейм: ')
-    # УДАЛИТЬ: когда вы будете вызывать эту функцию второй раз, после выбора режима "два игрока", то в data.PLAYERS будет имя первого игрока — его нельзя вычистить
-    PLAYERS.clear()
-    # ИСПРАВИТЬ: лучше append(), insert() очень медленный в сравнении и применяется только от безысходности
-    PLAYERS.insert(0, player_1)
-    PLAYERS.insert(1, player_2)
+    if player_2 not in data.STATS.keys():
+        data.STATS[player_2] = {'wins': 0, 'losses': 0, 'ties': 0, 'training': False}
+    data.PLAYERS.append(player_2)
 
-
-# ИСПРАВИТЬ: используйте параметр, регулирующий выравнивание: влево, вправо, центр — например
-#  def draw_board(align: Literal['left', 'right', 'center'] = 'left'):
-def draw_board(pos_index: int, pos_arg: int) -> str:
-    cross_line = '-------------'
+def draw_board(align: Literal['left', 'right', 'center'] = 'left') -> None:
+    cross_line = '-' * (data.DIM**2 + data.DIM + 1)
     # ИСПРАВИТЬ: лучше вычислить величину отступа в зависимости от выравнивания и сохранить в отдельную переменную, которую потом умножить на ' ' и прибавлять к той же строке
-    print(cross_line.rjust(pos_index))
-    for i in RANGE:
-        print('|'.rjust(pos_index - pos_arg),
-              # ИСПРАВИТЬ: а вот здесь потенциально может потребоваться .rjust() или лучше .center() — на случай, если вы захотите выводить не только data.BOARD, но и другие матрицы
-              BOARD[0 + i * DIM],
+    print(cross_line)
+    for i in data.RANGE:
+        print('|',
+              data.BOARD[0 + i * data.DIM],
               '|',
-              BOARD[1 + i * DIM],
+              data.BOARD[1 + i * data.DIM],
               '|',
-              BOARD[2 + i * DIM],
+              data.BOARD[2 + i * data.DIM],
               '|')
-    print(cross_line.rjust(pos_index))
-    # ИСПРАВИТЬ: заявлено возвращаемое значение str, как и должно быть, в то же время функция возвращает None
+        print(cross_line)
 
 
 if __name__ == '__main__':
-#     draw_board(0, 0)
-    write_ini()
-    pprint(SAVES)
+    draw_board('left')
+
+
 
 
 # stdout:
