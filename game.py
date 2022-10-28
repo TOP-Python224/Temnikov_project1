@@ -1,12 +1,12 @@
 """Дополнительный модуль: обработка игрового процесса."""
 
+# импорт дополнительных модулей проекта
 import data
 import functions
 
 
 def take_input(player: str, player_token: str) -> None:
-    """Запрашивает позицию в которую игрок хочет поставить токен 'X' или '0', проверяет возможность проставить токен в указанную клетку,
-    отрисовывает доску с проставленным токеном и записывает ход в глобальную переменную TURNS."""
+    """Запрашивает позицию в которую игрок хочет поставить токен 'X' или '0', проверяет возможность проставить токен в указанную клетку, отрисовывает доску с проставленным токеном и записывает ход в глобальную переменную TURNS."""
     while True:
         inp = input(player + f' Куда поставить: {player_token}? ')
         if not (inp in '123456789'):
@@ -20,6 +20,7 @@ def take_input(player: str, player_token: str) -> None:
         data.TURNS.append(inp)
         break
 
+
 def check_win() -> bool:
     """Проверяет наличие выигрышной комбинации."""
     for each in data.WINS_COORDS:
@@ -27,6 +28,7 @@ def check_win() -> bool:
             return bool(data.BOARD[each[0]-1])
     else:
         return False
+
 
 def game() -> None:
     """Обрабатывает игровую партию."""
@@ -54,6 +56,7 @@ def game() -> None:
             print('Ничья')
             break
 
+
 if __name__ == '__main__':
     functions.get_main_player_nickname()
     functions.get_second_player_nickname()
@@ -64,4 +67,3 @@ if __name__ == '__main__':
     print(data.BOARD)
     print(data.TURNS)
     print(data.STATS)
-

@@ -1,6 +1,9 @@
 """Дополнительный модуль: настройка партии."""
+
+# импорт дополнительных модулей проекта
 import data
 import functions
+
 
 def game_mode() -> None:
     """Запрашивает режим игры: 2 игрока либо против компьютера."""
@@ -11,10 +14,11 @@ def game_mode() -> None:
     else:
         functions.get_second_player_nickname()
 
+
 def choose_bot_difficulty_level() -> None:
     """Запрашивает уровень сложности бота."""
-    pass
+
+
 def choose_token() -> None:
     """Запрашивает токен, которым игрок будет играть партию."""
-    pass
 
